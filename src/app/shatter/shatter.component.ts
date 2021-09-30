@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
+import { selectAll } from 'd3';
+//import { selection } from 'd3';
 
 @Component({
   selector: 'app-shatter',
@@ -20,17 +22,34 @@ export class ShatterComponent implements OnInit {
     private height = 400 - (this.margin * 2);
     public dots;
     public plotDots;
-    private createSvg(): void {
+    
+   
+     createSvg(): void {
       this.svg = d3.select("figure#scatter")
       .append("svg")
       .attr("width", this.width + (this.margin * 2))
       .attr("height", this.height + (this.margin * 2))
       .append("g")
       .attr("transform", "translate(" + this.margin + "," + this.margin + ")");
+      selectAll("svg").on("click",(event,d)=> {
+         console.log("svg");
+        console.log(event);
+        console.log('msg is '+ (event.pageX)+' '+event.pageY);
+       this.addPlotDot(event.offsetX-this.margin, event.offsetY-this.margin);
+       });
+      //  this.dots.select("dot")
+      //  .enter()
+      //  .append("circle")
+      //  .attr("cx", d => <HTMLElement>document.getElementById(screenX.toString()))
+      //  .attr("cy", d => d.y)
+      //  .attr("r", 7)
+      //  .style("opacity", .5)
+      //  .style("fill", "#69b3a2");
+      //  this.addPlotDot();
   }
-  private drawPlot(): void {
+   drawPlot(): void {
     // Add X axis
-    const x = d3.scaleLinear()
+     const x = d3.scaleLinear()
     .domain([2009, 2017])
     .range([0, this.width ]);
     this.svg.append("g")
@@ -64,37 +83,48 @@ export class ShatterComponent implements OnInit {
     .text(d => d.Framework)
     .attr("x", d => x(d.Released))
     .attr("y", d => y(d.Stars))
+
+    //  this.dots.on("click", function(event, d) {
+    //     console.log(d);
+    //     event.stopPropagation();
+    //   })
 }
 changePlotDotColor(){
-  this.plotDots.on("click", function(d) {
+  this.plotDots.on("click", function(event,d) {
     console.log(d)
+    event.stopPropagation();
   //  d.getAttribute("fill");
   d3.select(this)
     .style("fill" , "rgb(0,0,0)")
 
   })
 }
-addPlotDot(){
-  this.svg.on("click",function(d){
-    console.log(d)
-    this.dots.select("dot")
-    .enter()
+addPlotDot(pageX: any, pageY: any) {
+  this.svg
     .append("circle")
-    .attr("cx", d => this.x)
-    .attr("cy", d => this.y)
+    .attr("cx", d => pageX)
+    .attr("cy", d => pageY)
     .attr("r", 7)
     .style("opacity", .5)
-    .style("fill", "#69b3a2");
-
-  })
+    .style("fill", "red");
 }
+
   constructor() { }
 
   ngOnInit(): void {
     this.createSvg();
     this.drawPlot();
     this.changePlotDotColor();
-    this.addPlotDot();
+    //this.addPlotDot();
   }
+  public ngOnChanges(): void {
+ 
+ 
+    }
+    
 
-}
+  
+  } 
+
+
+
